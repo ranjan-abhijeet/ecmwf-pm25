@@ -7,8 +7,8 @@ cds_client = cdsapi.Client()
 
 # Date from which we want the forecasts to start.
 # Final query format is as per the requirement of cdsapi
-
-query_date = datetime.now() - timedelta(days=1)
+query_delay = 1 # delay in query
+query_date = datetime.now() - timedelta(days=query_delay)
 date = query_date.strftime("%Y-%m-%d")
 cds_download_date = date + "/" + date
 
@@ -60,5 +60,6 @@ try:
     df.to_csv(f'{date}.csv')
     print(f"[+] Downloaded data in .csv file")
 
-except:
-    print("[-] Work on this")
+except Exception as err:
+    print("[-] Kindly check the following: ")
+    print(f"[-] {err}")
