@@ -1,9 +1,12 @@
 import cdsapi
-import xarray as xr
 import os
+import requests
+import glob
 import pandas as pd
+import xarray as xr
 from datetime import datetime, timedelta
 from pre_processor import extrapolator
+
 
 cds_client = cdsapi.Client()
 
@@ -80,3 +83,23 @@ try:
 except Exception as err:
     print("[-] Kindly check the following: ")
     print(f"[-] {err}")
+
+def upload_data():
+    print('[+] uploading the processed data to the server')
+    res: requests.Response
+    with open(f'output_data/pm2.5.csv', 'rb') as data:
+        try:
+            res = requests.post(os.environ.get('SERVER_URL'), data=data)
+        except requests.exceptions.ConnectionError:
+            print("[-] Upload failed")
+    if res.status_code == 200:
+        print('[+] uploading has been completed')
+        os.remove(f'output_data/pm2.5.csv')
+        print('[+] processed data is removed')
+    else:
+        print("[-] Upload failed")
+    file_list = glob.glob(data_path + "*.*")
+    print('[+] removing downloaded xlsx files')
+    for file in file_list:
+        os.remove(file)
+    print('[+] removed downloaded xlsx files')
