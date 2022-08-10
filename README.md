@@ -53,6 +53,9 @@ Install cfgrib library, a dependency in Xarray using the following command:
 
         conda install -c conda-forge cfgrib
 
+Requirements For Using CDSAPI & Transferring Processed FIle
+-----------------------------------------------------------
+
 For running this code in linux server, create a file named:
 
         .cdsapirc
