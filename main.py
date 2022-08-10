@@ -103,3 +103,5 @@ def upload_data():
     for file in file_list:
         os.remove(file)
     print('[+] removed downloaded xlsx files')
+
+upload_data()
