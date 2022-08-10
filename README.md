@@ -18,9 +18,11 @@ For linux server, use the following article:
 Setting up the Linux server environment
 ------------------------------------------------
 
-Install pip on server:
+Update the server:
 
         sudo apt update
+
+Install pip for python 3:
 
         sudo apt install python3-pip
 
