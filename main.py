@@ -85,7 +85,7 @@ except Exception as err:
     print(f"[-] {err}")
 
 def upload_data():
-    print('[+] uploading the processed data to the server')
+    print('[+] Uploading the processed data to the server')
     res: requests.Response
     with open(f'output_data/pm2.5.csv', 'rb') as data:
         try:
@@ -93,15 +93,15 @@ def upload_data():
         except requests.exceptions.ConnectionError:
             print("[-] Upload failed")
     if res.status_code == 200:
-        print('[+] uploading has been completed')
+        print('[+] Upload complete')
         os.remove(f'output_data/pm2.5.csv')
-        print('[+] processed data is removed')
+        print('[+] Processed data removed')
+        file_list = glob.glob(data_path + "*.*")
+        print('[+] Removing downloaded files')
+        for file in file_list:
+            os.remove(file)
+        print('[+] Downloaded files removed')
     else:
         print("[-] Upload failed")
-    file_list = glob.glob(data_path + "*.*")
-    print('[+] removing downloaded xlsx files')
-    for file in file_list:
-        os.remove(file)
-    print('[+] removed downloaded xlsx files')
 
 upload_data()
