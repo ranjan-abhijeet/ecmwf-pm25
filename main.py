@@ -18,24 +18,24 @@ date = query_date.strftime("%Y-%m-%d")
 cds_download_date = date + "/" + date
 
 # The data product we are using for PM 1.0, PM 2.5, and PM 10.0 forcasts
-product = 'cams-global-atmospheric-composition-forecasts'
+product = "cams-global-atmospheric-composition-forecasts"
 
 # Format of downloading data, other option is netcdf
-data_download_format = 'grib' 
+data_download_format = "grib" 
 
 # Forecasted lead time in hours.. asks for queries for next 24 hours
 # lead_time = [str(i) for i in range(0, 24)]
 # Need to work on the logic, staying with 36th hour forecast for now
-lead_time = ['36']
+lead_time = ["36"]
 # Variables we want to forecast, PM 1.0, PM 2.5, and PM 10.0 in this case
 forecasted_variables = [
                         # 'particulate_matter_10um',
-                        'particulate_matter_2.5um',
+                        "particulate_matter_2.5um",
                         # 'particulate_matter_1um'
                         ]
 
 # Hour from which forecast is required.
-time = '00:00'  # other option is '12:00'
+time = "00:00"  # other option is '12:00'
 
 # Bounding box for query region.. India at the moment
 # [north, west, south, east]
@@ -68,7 +68,7 @@ try:
 
     print(f"[+] Converting .grib to .csv file format")
     df = ds.to_dataframe()
-    df.to_csv(f'downloaded_data/{date}.csv')
+    df.to_csv(f"downloaded_data/{date}.csv")
     print(f"[+] Downloaded data for {date} in .csv file")
 
     df = pd.read_csv(data_path)
@@ -85,7 +85,7 @@ except Exception as err:
     print(f"[-] {err}")
 
 def upload_data():
-    print('[+] Uploading the processed data to the server')
+    print("[+] Uploading the processed data to the server")
     res: requests.Response
     with open(f'output_data/pm2.5.csv', 'rb') as data:
         try:
@@ -93,15 +93,17 @@ def upload_data():
         except requests.exceptions.ConnectionError:
             print("[-] Upload failed")
     if res.status_code == 200:
-        print('[+] Upload complete')
-        os.remove(f'output_data/pm2.5.csv')
-        print('[+] Processed data removed')
+        print("[+] Upload complete")
+        print("[+] Removing downloaded files")
+        os.remove(f"output_data/pm2.5.csv")
+        print("[+] Processed data removed")
         file_list = glob.glob(data_path + "*.*")
-        print('[+] Removing downloaded files')
+        print("[+] Removing downloaded files")
         for file in file_list:
             os.remove(file)
-        print('[+] Downloaded files removed')
+        print("[+] Downloaded files removed")
     else:
         print("[-] Upload failed")
 
-upload_data()
+if __name__=="__main__":
+    upload_data()
