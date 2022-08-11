@@ -26,7 +26,7 @@ Install pip for python 3:
 
         sudo apt install python3-pip
 
-Install miniconda on the server (Python 3.7):
+Install miniconda on the server (Python 3.7, download in home directory):
 
         wget https://repo.anaconda.com/miniconda/Miniconda3-py37_4.12.0-Linux-x86_64.sh
 
@@ -38,8 +38,11 @@ Run the installer, follow the instructions (press enter a number of times and th
 
         ./Miniconda3-latest-Linux-x86_64.sh
 
-Once miniconda is installed, create a python 3.7 environment using the below command:
+Add conda to path:
 
+        export PATH=/home/<username>/miniconda3/bin:$PATH
+
+Once miniconda is installed, create a python 3.7 environment using the below command:
 
         conda create -n py37 python=3.7 numpy=1.21.5 pandas=1.3.5 requests=2.28.1 scipy=1.7.3 xarray=0.20.1
 
