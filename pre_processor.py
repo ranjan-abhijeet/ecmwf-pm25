@@ -11,7 +11,7 @@ def extrapolator(input_data, to_extrapolate_data_path, model="NearestNDInterpola
         input_data: The input data is dataframe created from the downloaded ECMWF data
         to_extrapolate_data_path: The CSV file path which contains the coordinates at which we want to extrapolate.
     """
-    print('[+] interpolating data')
+    print('[+] Interpolating data')
     output = pd.read_csv(to_extrapolate_data_path)
 
     x = np.array(input_data["longitude"])
@@ -23,7 +23,6 @@ def extrapolator(input_data, to_extrapolate_data_path, model="NearestNDInterpola
     xi = output["longitude"]
     yi = output["latitude"]
     output["pm2.5"] = 1e+9 * interpolate(xi, yi) # converting kg/m3 to ug/m3
-    print('[+] interpolated data')
     output.dropna(inplace=True)
-    
+    print('[+] Interpolated data')
     return output

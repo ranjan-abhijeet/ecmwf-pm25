@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Data files
+india_coordinates/india_coordinates.csv
+downloaded_data/*.grib
+downloaded_data/*.csv
+output_data/*.csv
