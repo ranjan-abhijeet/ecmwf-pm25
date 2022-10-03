@@ -1,12 +1,9 @@
 import cdsapi
-import os
-import requests
-import glob
+import utils
 import pandas as pd
 import xarray as xr
 from datetime import datetime, timedelta
 from pre_processor import extrapolator
-
 
 cds_client = cdsapi.Client()
 
@@ -42,7 +39,9 @@ time = "00:00"  # other option is '12:00'
 bounding_box = [38, 68, 7, 98]
 
 # path of downloaded data
-data_path = f"downloaded_data/{date}.csv"
+csv_path = f"downloaded_data/{date}.csv"
+grib_path = f"downloaded_data/{date}.grib"
+interpolated_csv_path = "output_data/pm2.5.csv"
 
 # path of coordinates where we want to extrapolate
 india_coordinates_path = "india_coordinates/india_coordinates.csv" 
@@ -61,49 +60,19 @@ try:
             'leadtime_hour':lead_time,
             'area': bounding_box,
         },
-        f'downloaded_data/{date}.grib')    # name of the .grib file
-
-    print(f"[+] Reading download {date}.grib file")
-    ds = xr.open_dataset(f'downloaded_data/{date}.grib')
-
-    print(f"[+] Converting .grib to .csv file format")
-    df = ds.to_dataframe()
-    df.to_csv(f"downloaded_data/{date}.csv")
-    print(f"[+] Downloaded data for {date} in .csv file")
-
-    df = pd.read_csv(data_path)
-    df.drop(columns=["step", "number", "surface", "time", "valid_time"], inplace=True)
-    renamed_column = {"pm2p5":"pm2.5"}
-    df.rename(columns=renamed_column, inplace=True)
-
+        grib_path)    # name of the .grib file
+    
+    print(f"[+] Processing data")
+    utils.grib_to_csv(grib_file_path=grib_path, csv_file_path=csv_path)
+    df = utils.cleanup_dataframe(csv_file_path=csv_path)
     output = extrapolator(df, india_coordinates_path)
-    output.to_csv("output_data/pm2.5.csv", index=False)
+    output.to_csv(interpolated_csv_path, index=False)
 
-    print("[+] Task Complete")
+    print("[+] Cleaning up")
+    utils.remove_file(parent_folder= "downloaded_data", extension="grib")
+    utils.remove_file(parent_folder="downloaded_data", extension="csv")
+    print("[+] Task complete")
+    
 except Exception as err:
     print("[-] Kindly check the following: ")
     print(f"[-] {err}")
-
-def upload_data():
-    print("[+] Uploading the processed data to the server")
-    res: requests.Response
-    with open(f'output_data/pm2.5.csv', 'rb') as data:
-        try:
-            res = requests.post(os.environ.get('SERVER_URL'), data=data)
-        except requests.exceptions.ConnectionError:
-            print("[-] Upload failed")
-    if res.status_code == 200:
-        print("[+] Upload complete")
-        print("[+] Removing downloaded files")
-        os.remove(f"output_data/pm2.5.csv")
-        print("[+] Processed data removed")
-        file_list = glob.glob(data_path + "*.*")
-        print("[+] Removing downloaded files")
-        for file in file_list:
-            os.remove(file)
-        print("[+] Downloaded files removed")
-    else:
-        print("[-] Upload failed")
-
-if __name__=="__main__":
-    upload_data()
