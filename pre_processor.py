@@ -26,7 +26,7 @@ def extrapolator(input_data, to_extrapolate_data_path, model="NearestNDInterpola
     xi = output["longitude"]
     yi = output["latitude"]
     output["pm25"] = 1e+9 * interpolate(xi, yi) # converting kg/m3 to ug/m3
-    output.drop(columns=['longitude', 'latitude'], inplace=True)
+    output.drop(columns=['longitude', 'latitude', 'k_id'], inplace=True)
     output.dropna(inplace=True)
     logger.info('data interpolated')
     return output
