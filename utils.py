@@ -1,5 +1,6 @@
 import os
 import glob
+import logging
 import xarray as xr
 import pandas as pd
 
@@ -32,7 +33,7 @@ def grib_to_csv(grib_file_path: str, csv_file_path: str):
 def cleanup_dataframe(
                     csv_file_path: str,
                     cols_to_drop: list = ["step", "number", "surface", "time", "valid_time"],
-                    cols_to_rename: dict = {"pm2p5":"pm2.5"}):
+                    cols_to_rename: dict = {"pm2p5":"pm25"}):
     """
     Cleanups the csv i.e., remove unwanted columns, rename_columns.
 
@@ -49,3 +50,19 @@ def cleanup_dataframe(
     df.rename(columns=cols_to_rename, inplace=True)
 
     return df
+
+
+def get_logger():
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    logger
+    try:
+        handler = logging.FileHandler("log_folder/custom_log.log", mode='w')
+    except FileNotFoundError:
+        os.makedirs("log_folder")
+        handler = logging.FileHandler("log_folder/custom_log.log")
+
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
