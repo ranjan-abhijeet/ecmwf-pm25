@@ -14,6 +14,7 @@ logger.info('cdsapi client instantiated')
 # Final query format is as per the requirement of cdsapi
 query_delay = 1 # delay in query
 query_date = datetime.now() - timedelta(days=query_delay)
+data_date = datetime.now().strftime("%Y-%m-%d")
 date = query_date.strftime("%Y-%m-%d")
 cds_download_date = date + "/" + date
 logger.info(f'downloading data for {cds_download_date}')
@@ -26,8 +27,8 @@ TYPE = 'forecast'
 # Format of downloading data, other option is netcdf
 data_download_format = "grib" 
 
-# Forecasted lead time in hours.. asks for queries for next 24 hours
-lead_time = [str(i) for i in range(24, 27)]
+# Forecasted lead time in hours.. asks for for next forecast for current day's 12 hours
+lead_time = [str(i) for i in range(24, 48)]
 
 # Variables we want to forecast, PM 1.0, PM 2.5, and PM 10.0 in this case
 forecasted_variables = [
@@ -55,7 +56,6 @@ def download_data():
         for lead in lead_time:
             csv_path = f"{data_download_home_path}/{date}_{lead}.csv"
             grib_path = f"{data_download_home_path}/{date}_{lead}.grib"
-            output_path = f"{interpolated_data_home_path}/pm25_{lead}.csv"
 
             cds_client.retrieve(
                 PRODUCT,
@@ -70,19 +70,22 @@ def download_data():
                 },
                 grib_path)    # name of the .grib file
             
-            logger.info(f'processing downloaded data for date {date} hour {int(lead) - 24}')
+            logger.info(f'processing downloaded data for date {data_date} hour {int(lead) - 24}')
             utils.grib_to_csv(grib_file_path=grib_path, csv_file_path=csv_path)
             df = utils.cleanup_dataframe(csv_file_path=csv_path)
             output = extrapolator(df, india_coordinates_path)
-            data[lead] = output
+            output.rename(columns={"pm25": f"hour_{int(lead) - 24}"}, inplace=True)
+            data = pd.concat([data, output], axis=1)
             logger.info('processing complete')
             
             logger.info('cleaning up local files')
             utils.remove_file(parent_folder= "downloaded_data", extension="grib")
             utils.remove_file(parent_folder="downloaded_data", extension="csv")
             
-            logger.info(f'data downloaded for date {date} hour {int(lead) - 24}')
-        data.to_csv("testfile.csv", index=False)
+            logger.info(f'data downloaded for date {data_date} hour {int(lead) - 24}')
+        data.to_csv(f"{interpolated_data_home_path}/{data_date}.csv", index=False)
+        logger.info(f'process complete, data exported for date {data_date}')
+
     except Exception as err:
         logger.exception(err)
         print('[-] Error')
