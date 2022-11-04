@@ -1,18 +1,24 @@
 import cdsapi
 import utils
+import os
 import pandas as pd
 import xarray as xr
 from datetime import datetime, timedelta
 from pre_processor import extrapolator
+from dotenv import load_dotenv
 
+
+load_dotenv()
 
 logger = utils.get_logger()
-cds_client = cdsapi.Client()
+CDS_URL = os.getenv('CDS_URL')
+CDS_KEY = os.getenv('CDS_KEY')
+cds_client = cdsapi.Client(url=CDS_URL, key=CDS_KEY)
 logger.info('cdsapi client instantiated')
 
 # Date from which we want the forecasts to start.
 # Final query format is as per the requirement of cdsapi
-query_delay = 1 # delay in query
+query_delay = 1 # number of days of delay in query
 query_date = datetime.now() - timedelta(days=query_delay)
 data_date = datetime.now().strftime("%Y-%m-%d")
 date = query_date.strftime("%Y-%m-%d")
