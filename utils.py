@@ -32,8 +32,8 @@ def grib_to_csv(grib_file_path: str, csv_file_path: str):
 
 def cleanup_dataframe(
                     csv_file_path: str,
-                    cols_to_drop: list = ["step", "number", "surface", "time", "valid_time"],
-                    cols_to_rename: dict = {"pm2p5":"pm25"}):
+                    cols_to_drop: list = ["step", "number", "surface", "valid_time"],
+                    cols_to_rename: dict = {"pm2p5":"pm25", "time": "date"}):
     """
     Cleanups the csv i.e., remove unwanted columns, rename_columns.
 
@@ -50,6 +50,7 @@ def cleanup_dataframe(
     df.rename(columns=cols_to_rename, inplace=True)
 
     return df
+
 
 
 def get_logger():

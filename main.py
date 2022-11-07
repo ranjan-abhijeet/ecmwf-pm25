@@ -16,12 +16,8 @@ CDS_KEY = os.getenv('CDS_KEY')
 cds_client = cdsapi.Client(url=CDS_URL, key=CDS_KEY)
 logger.info('cdsapi client instantiated')
 
-# Date from which we want the forecasts to start.
-# Final query format is as per the requirement of cdsapi
-query_delay = 1 # number of days of delay in query
-query_date = datetime.now() - timedelta(days=query_delay)
-data_date = datetime.now().strftime("%Y-%m-%d")
-date = query_date.strftime("%Y-%m-%d")
+# cds_download_date = date + "/" + date
+date = "2022-10-26"
 cds_download_date = date + "/" + date
 logger.info(f'downloading data for {cds_download_date}')
 
@@ -34,7 +30,7 @@ TYPE = 'forecast'
 data_download_format = "grib" 
 
 # Forecasted lead time in hours.. asks for for next forecast for current day's 12 hours
-lead_time = [str(i) for i in range(24, 48)]
+lead_time = [str(i) for i in range(24)]
 
 # Variables we want to forecast, PM 1.0, PM 2.5, and PM 10.0 in this case
 forecasted_variables = [
@@ -76,11 +72,11 @@ def download_data():
                 },
                 grib_path)    # name of the .grib file
             
-            logger.info(f'processing downloaded data for date {data_date} hour {int(lead) - 24}')
+            logger.info(f'processing downloaded data for date {date} hour {int(lead)}')
             utils.grib_to_csv(grib_file_path=grib_path, csv_file_path=csv_path)
             df = utils.cleanup_dataframe(csv_file_path=csv_path)
             output = extrapolator(df, india_coordinates_path)
-            output.rename(columns={"pm25": f"hour_{int(lead) - 24}"}, inplace=True)
+            output.rename(columns={"pm25": f"hour_{int(lead)}"}, inplace=True)
             data = pd.concat([data, output], axis=1)
             logger.info('processing complete')
             
@@ -88,9 +84,9 @@ def download_data():
             utils.remove_file(parent_folder= "downloaded_data", extension="grib")
             utils.remove_file(parent_folder="downloaded_data", extension="csv")
             
-            logger.info(f'data downloaded for date {data_date} hour {int(lead) - 24}')
-        data.to_csv(f"{interpolated_data_home_path}/{data_date}.csv", index=False)
-        logger.info(f'process complete, data exported for date {data_date}')
+            logger.info(f'data downloaded for date {date} hour {int(lead)}')
+        data.to_csv(f"{interpolated_data_home_path}/{date}.csv", index=False)
+        logger.info(f'process complete, data exported for date {date}')
 
     except Exception as err:
         logger.exception(err)
