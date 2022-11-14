@@ -17,7 +17,7 @@ cds_client = cdsapi.Client(url=CDS_URL, key=CDS_KEY)
 logger.info('cdsapi client instantiated')
 
 # cds_download_date = date + "/" + date
-date = "2022-10-26"
+date = "2022-11-07"
 cds_download_date = date + "/" + date
 logger.info(f'downloading data for {cds_download_date}')
 
@@ -30,8 +30,8 @@ TYPE = 'forecast'
 data_download_format = "grib" 
 
 # Forecasted lead time in hours.. asks for for next forecast for current day's 12 hours
-lead_time = [str(i) for i in range(24)]
-
+lead_time = ["14"]
+# lead_time = [str(i) for i in range(1)]
 # Variables we want to forecast, PM 1.0, PM 2.5, and PM 10.0 in this case
 forecasted_variables = [
                         "particulate_matter_2.5um",
