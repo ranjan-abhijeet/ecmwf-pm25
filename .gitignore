@@ -4,3 +4,4 @@ venv/
 log_folder/
 downloaded_data/
 output_data/
+.DS_Store
